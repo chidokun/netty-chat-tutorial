@@ -13,11 +13,11 @@ public class NettyServer {
 
     private int port;
 
+    // constructor
     public NettyServer(int port) {
         this.port = port;
     }
 
-    // constructor
 
     public static void main(String[] args) throws Exception {
 
@@ -37,9 +37,9 @@ public class NettyServer {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(new Server.RequestDecoder(),
-                                    new Server.ResponseDataEncoder(),
-                                    new Server.ProcessingHandler());
+                            ch.pipeline().addLast(new RequestDecoder(),
+                                    new ResponseDataEncoder(),
+                                    new ProcessingHandler());
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);

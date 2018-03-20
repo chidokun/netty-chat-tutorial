@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package letschat.protobuf;
+
+option java_package = "letschat.protobuf";
+option java_outer_classname = "RequestProtos";
+
+message Request {
+    required string code = 1;
+}
