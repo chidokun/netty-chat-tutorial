@@ -34,9 +34,7 @@ public class NettyServer {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(new RequestDecoder(),
-                                    new ResponseDataEncoder(),
-                                    new ProcessingHandler());
+                            ch.pipeline().addLast(new ProcessingHandler());
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);

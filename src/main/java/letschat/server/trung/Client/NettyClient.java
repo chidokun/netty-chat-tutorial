@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.ReplayingDecoder;
 
+import java.net.ConnectException;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -31,15 +32,20 @@ public class NettyClient {
                 @Override
                 public void initChannel(SocketChannel ch)
                         throws Exception {
-                    ch.pipeline().addLast(new RequestDataEncoder(),
-                            new ResponseDataDecoder(), new ClientHandler());
+                    ch.pipeline().addLast(new ClientHandler());
                 }
             });
 
             ChannelFuture f = b.connect(host, port).sync();
 
-            f.channel().closeFuture().sync();
-        } finally {
+
+            //f.channel().closeFuture().sync();
+        } catch (Exception e) {
+            System.err.println("ahihi");
+            e.printStackTrace();
+        }
+
+        finally {
             workerGroup.shutdownGracefully();
         }
     }
