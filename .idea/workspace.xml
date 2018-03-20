@@ -2,20 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5ab17c75-d3aa-4f9b-9897-6b9ba7b267ac" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/ChatToUser.proto" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/LoginResponse.proto" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/Request.proto" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/Response.proto" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/User.proto" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/letschat/protobuf/UserMessageResponse.proto" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/client/App.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/letschat/App.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protobuf/LoginResponse.proto" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protobuf/Request.proto" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protobuf/Response.proto" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protobuf/User.proto" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/letschat/AppTest.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/classes/letschat/client/App.class" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -42,7 +29,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/letschat/client/App.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="133">
-              <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
               <folding>
                 <element signature="e#88#89#0" expanded="true" />
                 <element signature="e#138#139#0" expanded="true" />
@@ -65,7 +52,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/User.proto">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="95">
-              <caret line="5" column="31" lean-forward="true" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
+              <caret line="5" column="31" lean-forward="false" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -75,7 +62,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/Response.proto">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="19">
-              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="5" selection-end-column="39" />
+              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="5" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -85,7 +72,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/Request.proto">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="18" lean-forward="true" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
+              <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -105,7 +92,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/ChatToUser.proto">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="95">
-              <caret line="5" column="49" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="5" selection-end-column="49" />
+              <caret line="5" column="49" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="5" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -238,36 +225,6 @@
               <item name="letschat" type="462c0819:PsiDirectoryNode" />
               <item name="protobuf" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="letschat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="letschat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-              <item name="classes" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="letschat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-              <item name="classes" type="462c0819:PsiDirectoryNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="letschat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-              <item name="generated-sources" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="letschat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="letschat" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-              <item name="generated-test-sources" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -391,12 +348,12 @@
       <option name="presentableId" value="Default" />
       <updated>1521515468134</updated>
       <workItem from="1521515473131" duration="695000" />
-      <workItem from="1521516286525" duration="1122000" />
+      <workItem from="1521516286525" duration="1240000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1817000" />
+    <option name="totallyTimeSpent" value="1935000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1053" extended-state="6" />
@@ -520,7 +477,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/User.proto">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
-          <caret line="5" column="31" lean-forward="true" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
+          <caret line="5" column="31" lean-forward="false" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -528,7 +485,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/Response.proto">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
-          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="5" selection-end-column="39" />
+          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="5" selection-end-column="39" />
           <folding />
         </state>
       </provider>
@@ -536,7 +493,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/Request.proto">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="18" lean-forward="true" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
+          <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -552,7 +509,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/letschat/protobuf/ChatToUser.proto">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
-          <caret line="5" column="49" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="5" selection-end-column="49" />
+          <caret line="5" column="49" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="5" selection-end-column="49" />
           <folding />
         </state>
       </provider>
@@ -576,7 +533,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/letschat/client/App.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="133">
-          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
             <element signature="e#88#89#0" expanded="true" />
             <element signature="e#138#139#0" expanded="true" />
