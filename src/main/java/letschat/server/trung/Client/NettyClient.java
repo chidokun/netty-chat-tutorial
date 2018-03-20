@@ -1,5 +1,10 @@
 package letschat.server.trung.Client;
 
+<<<<<<< HEAD
+=======
+import letschat.server.trung.Server.RequestData;
+import letschat.server.trung.Server.ResponseData;
+>>>>>>> 9e0e72b757dad4ec4bc3f5aa07627a541d47ec8a
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

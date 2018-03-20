@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-package letschat.server.trung.Server;
-=======
-package letschat.server.trung.Server;;
->>>>>>> 9e0e72b757dad4ec4bc3f5aa07627a541d47ec8a
+package letschat.server;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -16,10 +12,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
 
         RequestData requestData = (RequestData) msg;
-        RequestData responseData = new RequestData();
-        responseData.setStringValue("reply: " + requestData.getStringValue());
+        ResponseData responseData = new ResponseData();
+        responseData.setIntValue(requestData.getIntValue() * 2);
         ChannelFuture future = ctx.writeAndFlush(responseData);
         future.addListener(ChannelFutureListener.CLOSE);
-        System.out.println("Server receive: " + requestData + requestData.getStringValue());
+        System.out.println(requestData + requestData.getStringValue());
     }
 }
