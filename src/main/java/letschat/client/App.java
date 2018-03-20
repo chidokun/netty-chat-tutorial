@@ -29,10 +29,12 @@ public class App {
                     showUserChat();
                     break;
                 case ":b":
-                    System.out.println("Nothing to back!");
+                    System.out.println("Nothing to back!\n");
+                    break;
+                case "":
                     break;
                 default:
-                    System.out.println("Invalid command. Type \":h\" for help!");
+                    System.out.println("Invalid command. Type \":h\" for help!\n");
             }
         }
     }
