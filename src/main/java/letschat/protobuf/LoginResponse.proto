@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package letschat.protobuf;
+
+option java_package = "letschat.protobuf";
+option java_outer_classname = "LoginResponseProtos";
+
+message LoginResponse {
+    required int32 code = 1;
+    optional string token = 2;
+}

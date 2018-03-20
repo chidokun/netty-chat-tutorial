@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package letschat.protobuf;
+
+option java_package = "letschat.protobuf";
+option java_outer_classname = "UserMessageResponseProtos";
+
+message UserMessageResponse {
+    required int32 code = 1;
+    required string fromuser = 2;
+    required string touser = 3;
+    required string message = 4;
+    required int64 time = 5;
+}
