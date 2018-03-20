@@ -1,6 +1,6 @@
-package Client;
+package letschat.server.trung.Client;
 
-import Server.RequestData;
+import letschat.server.trung.Server.RequestData;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

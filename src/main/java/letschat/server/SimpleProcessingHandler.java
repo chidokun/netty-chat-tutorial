@@ -1,4 +1,4 @@
-package Server;
+package letschat.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;

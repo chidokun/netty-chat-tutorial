@@ -1,7 +1,7 @@
-package Client;
+package letschat.server.trung.Client;
 
-import Server.RequestData;
-import Server.ResponseData;
+import letschat.server.trung.Server.RequestData;
+import letschat.server.trung.Server.ResponseData;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;

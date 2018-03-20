@@ -1,4 +1,4 @@
-package Server;
+package letschat.server;
 
 public class RequestData {
     private int intValue;

@@ -1,7 +1,7 @@
-package Client;
+package letschat.server.trung.Client;
 
-import Server.RequestData;
-import Server.ResponseData;
+import letschat.server.trung.Server.RequestData;
+import letschat.server.trung.Server.ResponseData;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

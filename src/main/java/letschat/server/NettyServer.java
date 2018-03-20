@@ -1,4 +1,4 @@
-package Server;
+package letschat.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
