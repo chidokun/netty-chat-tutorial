@@ -13,21 +13,27 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.util.Scanner;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
+    private String mess;
 
-    @Override
-    public void channelActive(ChannelHandlerContext channelHandlerContext){
-        Scanner in = new Scanner(System.in);
-        String m = "";
-        while(!m.equals("exit")) {
-            m = in.nextLine();
-            channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(m, CharsetUtil.UTF_8));
-        }
+    public ClientHandler() {}
 
+    public ClientHandler(String mess) {
+        this.mess = mess;
     }
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx)
+            throws Exception {
 
-    public void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf in) {
-        System.out.println("Client received: " + in.toString(CharsetUtil.UTF_8));
+        RequestData msg = new RequestData();
+        msg.setIntValue(123);
+
+        Scanner scan= new Scanner(System.in);
+        msg.setStringValue(scan.nextLine());
+
+
+
+        ChannelFuture future = ctx.writeAndFlush(msg);
     }
 
     @Override

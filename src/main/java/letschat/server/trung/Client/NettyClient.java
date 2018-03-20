@@ -3,21 +3,16 @@ package letschat.server.trung.Client;
 import letschat.server.trung.Server.RequestData;
 import letschat.server.trung.Server.ResponseData;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.ReplayingDecoder;
 
-import java.net.ConnectException;
-import java.nio.charset.Charset;
-import java.util.List;
+import java.util.Scanner;
 
 public class NettyClient {
     public static void main(String[] args) throws Exception {
-
+        String text = "start";
         String host = "localhost";
         int port = 8080;
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -32,22 +27,28 @@ public class NettyClient {
                 @Override
                 public void initChannel(SocketChannel ch)
                         throws Exception {
-                    ch.pipeline().addLast(new ClientHandler());
+                        ch.pipeline().addLast(new RequestDataEncoder(),
+                                new ResponseDataDecoder(), new ClientHandler());
+
                 }
             });
 
             ChannelFuture f = b.connect(host, port).sync();
-
-
-            //f.channel().closeFuture().sync();
-        } catch (Exception e) {
-            System.err.println("ahihi");
-            e.printStackTrace();
-        }
-
-        finally {
+            f.channel().closeFuture().sync();
+        } finally {
             workerGroup.shutdownGracefully();
         }
+
+
+
+//        ChatToUserProtos.ChatToUser.Builder packageBuilder = ChatToUserProtos.ChatToUser.newBuilder()
+//                .setFromuser("Trung")
+//                .setMessage("Hello")
+//                .setTouser("admin")
+//                .setTime(12345)
+//                .setToken("adfminasdf");
+//        ChatToUserProtos.ChatToUser mess = packageBuilder.build();
+//        System.out.println(mess.isInitialized());
     }
 }
 
