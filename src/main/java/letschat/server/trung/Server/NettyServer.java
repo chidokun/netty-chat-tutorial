@@ -1,7 +1,10 @@
-package Server;
+package letschat.server.trung.Server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -34,9 +37,9 @@ public class NettyServer {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(new RequestDecoder(),
-                                    new ResponseDataEncoder(),
-                                    new ProcessingHandler());
+                            ch.pipeline().addLast(new Server.RequestDecoder(),
+                                    new Server.ResponseDataEncoder(),
+                                    new Server.ProcessingHandler());
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
