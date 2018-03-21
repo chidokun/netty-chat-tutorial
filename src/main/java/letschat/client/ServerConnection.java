@@ -24,6 +24,7 @@ public class ServerConnection {
         }
 
         this.socket.setSoTimeout(10000);
+        this.socket.setKeepAlive(true);
         this.setOutputStream(new DataOutputStream(this.getSocket().getOutputStream()));
         this.setInputStream(new DataInputStream(this.getSocket().getInputStream()));
         return true;

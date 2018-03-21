@@ -22,4 +22,5 @@ message Request {
     optional User user = 2;
     optional ChatToUser chattouser = 3;
     optional string token = 4;
+    optional string name = 5;
 }

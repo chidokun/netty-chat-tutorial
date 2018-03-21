@@ -1,10 +1,7 @@
 package letschat.server.trung.Client;
 
-<<<<<<< HEAD
-import letschat.server.trung.Server.ResponseData;
-=======
+
 import letschat.server.trung.Server.RequestData;
->>>>>>> 9e0e72b757dad4ec4bc3f5aa07627a541d47ec8a
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
