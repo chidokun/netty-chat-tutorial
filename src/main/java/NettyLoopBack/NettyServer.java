@@ -2,6 +2,7 @@ package NettyLoopBack;
 
 import com.google.protobuf.Message;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -16,7 +17,9 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import letschat.protobuf.MessageProto;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class NettyServer {
 
@@ -67,7 +70,21 @@ public class NettyServer {
         });
 
         bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-        bootstrap.bind(8080).sync();
+//        bootstrap.bind(8080).sync();
+        Channel channel = bootstrap.bind(8080).sync().channel();
+        MessageProto.MessageTest mess;
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        while(true){
+            try {
+//                System.out.println("Go vao: " + in.readLine());
+                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
+//                channel.writeAndFlush(in.readLine() );
+//                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
+                channel.writeAndFlush(mess);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

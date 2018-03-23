@@ -55,6 +55,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 //
 //    }
 
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        System.out.println("Client " + ctx.channel().remoteAddress() + " connected");
+    }
+
     //String Encode Decode
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -64,7 +70,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         String mess = "Da nhan duoc: " +  recContent;
         System.out.println("Server received: " + msg);
         ;
-        ctx.writeAndFlush(rec.newBuilderForType().setContent(mess).build());
+        ctx.write(rec.newBuilderForType().setContent(mess).build());
 //        ctx.writeAndFlush(Unpooled.copiedBuffer(mess, CharsetUtil.UTF_8));
 
 
@@ -73,6 +79,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         System.out.println("\t----ChannelReadComple");
+        ctx.flush();
 //        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
     }
 
@@ -81,4 +88,6 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         cause.printStackTrace();
         ctx.close();
     }
+
+
 }

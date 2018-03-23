@@ -2,9 +2,7 @@ package NettyLoopBack;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -22,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class NettyClient {
+
 
     public static void main(String[] args) throws InterruptedException {
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -47,18 +46,72 @@ public class NettyClient {
             }
         });
 
-
+        final boolean[] connect = {false};
         String serverIp = "localhost";
-            Channel channel = b.connect(serverIp, 8080).sync().channel();
-        MessageProto.MessageTest mess;
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while(true){
+        int port = -1;
+        final Channel[] channel = {null};
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        while (!connect[0]) {
             try {
-//                System.out.println("Go vao: " + in.readLine());
-                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
-//                channel.writeAndFlush(in.readLine() );
-//                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
-                channel.writeAndFlush(mess);
+                System.out.print("Server: ");
+                serverIp = input.readLine();
+                if (serverIp.equals("")) {
+                    System.out.println("Default server: localhost");
+                    serverIp = "localhost";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                System.out.print("port: ");
+                String portString = input.readLine();
+                if (portString.equals("")) {
+                    System.out.println("Default port: 8080");
+                    port = 8080;
+                } else
+                    try {
+                        port = Integer.parseInt(portString);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Port mus be a valid integer");
+                        continue;
+                    }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ChannelFuture future = b.connect(serverIp, port);
+
+//            future = future.sync();
+            System.out.println("ok");
+            future.addListener(new ChannelFutureListener() {
+
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        System.out.println("Connected!");
+                        channel[0] = future.sync().channel();
+                        connect[0] = true;
+                    } else {
+                        System.out.println("Cannot find server, please try again!");
+                    }
+                }
+            });
+            future.await();
+        }
+
+//        String serverIp = "localhost";
+//        int port = 8080;
+//        Channel channel = b.connect(serverIp, port).sync().channel();
+        MessageProto.MessageTest mess;
+
+        while (true) {
+            try {
+//                System.out.println("Go vao: " + input.readLine());
+                mess = MessageProto.MessageTest.newBuilder().setContent(input.readLine()).build();
+//                channel.writeAndFlush(input.readLine() );
+//                channel.writeAndFlush(Unpooled.copiedBuffer(input.readLine(), CharsetUtil.UTF_8));
+                channel[0].writeAndFlush(mess);
+//                channel.writeAndFlush(mess);
             } catch (IOException e) {
                 e.printStackTrace();
             }
