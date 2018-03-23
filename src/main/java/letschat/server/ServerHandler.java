@@ -1,31 +1,20 @@
 package letschat.server;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import letschat.protobuf.RequestProtos;
-
-import java.net.InetSocketAddress;
+import letschat.protobuf.MessageProto;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Channel ip = ctx.channel();
-        System.out.print(ip);
-        RequestProtos.Request request = RequestProtos.Request.newBuilder()
-                .setType(0)
-                .setUser(RequestProtos.User.newBuilder()
-                        .setUsername("Trung")
-                        .setPassword("oK")
-                        .build())
-                .build();
-//        RequestProtos.Request req = (RequestProtos.Request) msg;
-
-        System.out.println(msg);// + ts.toString());
-    }
-
-    // Here is how we send out heart beat for idle to long
+//    @Override
+//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//        System.out.println("new client: " + ctx.channel().remoteAddress());
+//        LoopBackTimeStamp ts = (LoopBackTimeStamp) msg;
+//        ts.setRecvTimeStamp(System.nanoTime());
+//        System.out.println(LocalDateTime.now() +"loop delay in ms : " + 1.0 * ts.timeLapseInNanoSecond() / 1000000L);
+//    }
+//
+//    // Here is how we send out heart beat for idle to long
 //    @Override
 //    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 //        if (evt instanceof IdleStateEvent) {
@@ -35,11 +24,60 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 //            }
 //        }
 //    }
+//
+//    @Override
+//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+//        // Close the connection when an exception is raised.
+//        cause.printStackTrace();
+//        ctx.close();
+//    }
+
+    //EchoServer:
+//    @Override
+//    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+//        System.out.println("Receive from: " + ctx.channel().remoteAddress());
+//        ByteBuf in = (ByteBuf) msg;
+//        String mess =  "Da nhan duoc: " + in.toString(CharsetUtil.UTF_8);
+//
+//        System.out.println("Server received: " + in.toString(CharsetUtil.UTF_8));
+////        ctx.writeAndFlush(in);
+//        ctx.writeAndFlush(Unpooled.copiedBuffer(mess, CharsetUtil.UTF_8));
+//
+//    }
+
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        System.out.println("Client " + ctx.channel().remoteAddress() + " connected");
+    }
+
+    //String Encode Decode
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        System.out.println("Receive from: " + ctx.channel().remoteAddress());
+        MessageProto.MessageTest rec = (MessageProto.MessageTest) msg;
+        String recContent = rec.getContent();
+        String mess = "Da nhan duoc: " +  recContent;
+        System.out.println("Server received: " + msg);
+        ;
+        ctx.write(rec.newBuilderForType().setContent(mess).build());
+//        ctx.writeAndFlush(Unpooled.copiedBuffer(mess, CharsetUtil.UTF_8));
+
+
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        System.out.println("\t----ChannelReadComple");
+        ctx.flush();
+//        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        // Close the connection when an exception is raised.
         cause.printStackTrace();
         ctx.close();
     }
+
+
 }

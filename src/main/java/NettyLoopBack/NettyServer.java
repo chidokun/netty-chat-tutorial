@@ -60,7 +60,6 @@ public class NettyServer {
 //            }
 
 
-
             //EchoServer:
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -79,23 +78,24 @@ public class NettyServer {
 
         bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 //        bootstrap.bind(8080).sync();
-        Channel channel = bootstrap.bind(8080).sync().channel();
 
+        Channel channel = bootstrap.bind(8080).sync().channel();
+        System.out.println(channel.id());
         MessageProto.MessageTest mess;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while(true){
-            for (Channel ch : channels) {
-                try {
-                    channel = ch;
+        while (true) {
+            try {
 //                System.out.println("Go vao: " + in.readLine());
-                    mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
-                    System.out.println("write to: " + channel.remoteAddress());
+                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
+                System.out.println("write to: " + channel.remoteAddress());
 //                channel.writeAndFlush(in.readLine() );
 //                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
-                    channel.writeAndFlush(mess);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                channel.writeAndFlush(mess);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            for (Channel ch : channels) {
                 //do something with ch object :)
                 System.out.println("Channel in group: " + ch);
             }
