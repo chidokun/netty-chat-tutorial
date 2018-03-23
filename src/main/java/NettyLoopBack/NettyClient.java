@@ -1,7 +1,6 @@
 package NettyLoopBack;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -10,9 +9,6 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 import letschat.protobuf.MessageProto;
 
 import java.io.BufferedReader;
@@ -46,12 +42,11 @@ public class NettyClient {
             }
         });
 
-        final boolean[] connect = {false};
         String serverIp = "localhost";
         int port = -1;
         final Channel[] channel = {null};
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        while (!connect[0]) {
+        while (true) {
             try {
                 System.out.print("Server: ");
                 serverIp = input.readLine();
@@ -85,18 +80,22 @@ public class NettyClient {
 //            future = future.sync();
             System.out.println("ok");
             future.addListener(new ChannelFutureListener() {
-
+                @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         System.out.println("Connected!");
+                        System.out.println(channel[0]);
                         channel[0] = future.sync().channel();
-                        connect[0] = true;
+                        System.out.println(channel[0]);
                     } else {
-                        System.out.println("Cannot find server, please try again!");
+                        System
+                                .out.println("Cannot find server, please try again!");
                     }
                 }
             });
-            future.await();
+            if (future.await().isSuccess())
+                break;
+//            System.out.println("after wai: " +connect[0]);
         }
 
 //        String serverIp = "localhost";

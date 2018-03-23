@@ -64,7 +64,7 @@ public class NettyServer {
 
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast(new ProtobufEncoder());
-                pipeline.addLast(new ServerHandler());
+                pipeline.addLast(new TestServerHandler());
 
             }
         });
