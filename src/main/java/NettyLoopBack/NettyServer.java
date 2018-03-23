@@ -6,6 +6,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -15,6 +17,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import letschat.protobuf.MessageProto;
 
 import java.io.BufferedReader;
@@ -23,10 +26,15 @@ import java.io.InputStreamReader;
 
 public class NettyServer {
 
+    static final ChannelGroup channels =
+            new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
     public static void main(String[] args) throws IOException, InterruptedException {
         NioEventLoopGroup boosGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
         ServerBootstrap bootstrap = new ServerBootstrap();
+
         bootstrap.group(boosGroup, workerGroup);
         bootstrap.channel(NioServerSocketChannel.class);
 
@@ -64,7 +72,7 @@ public class NettyServer {
 
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast(new ProtobufEncoder());
-                pipeline.addLast(new TestServerHandler());
+                pipeline.addLast(new TestServerHandler(channels));
 
             }
         });
@@ -72,18 +80,26 @@ public class NettyServer {
         bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 //        bootstrap.bind(8080).sync();
         Channel channel = bootstrap.bind(8080).sync().channel();
+
         MessageProto.MessageTest mess;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         while(true){
-            try {
+            for (Channel ch : channels) {
+                try {
+                    channel = ch;
 //                System.out.println("Go vao: " + in.readLine());
-                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
+                    mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
+                    System.out.println("write to: " + channel.remoteAddress());
 //                channel.writeAndFlush(in.readLine() );
 //                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
-                channel.writeAndFlush(mess);
-            } catch (IOException e) {
-                e.printStackTrace();
+                    channel.writeAndFlush(mess);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //do something with ch object :)
+                System.out.println("Channel in group: " + ch);
             }
+
         }
     }
 }

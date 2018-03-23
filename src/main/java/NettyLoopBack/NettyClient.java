@@ -84,9 +84,7 @@ public class NettyClient {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         System.out.println("Connected!");
-                        System.out.println(channel[0]);
                         channel[0] = future.sync().channel();
-                        System.out.println(channel[0]);
                     } else {
                         System
                                 .out.println("Cannot find server, please try again!");

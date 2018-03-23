@@ -2,9 +2,22 @@ package NettyLoopBack;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.group.ChannelGroup;
 import letschat.protobuf.MessageProto;
 
 public class TestServerHandler extends SimpleChannelInboundHandler<MessageProto.MessageTest> {
+    private ChannelGroup group;// = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    public TestServerHandler(ChannelGroup group) {
+        this.group = group;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+//        ctx.channel().id();
+        group.add(ctx.channel());
+        System.out.println("Client " + ctx.channel().remoteAddress() + " connected");
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageProto.MessageTest msg) throws Exception {
