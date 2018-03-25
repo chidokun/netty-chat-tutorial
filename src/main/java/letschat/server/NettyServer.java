@@ -19,6 +19,10 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import letschat.protobuf.MessageProto;
+import letschat.protobuf.RequestProtos;
+import letschat.protobuf.ResponseProtos;
+import letschat.storage.RocksDBStorage;
+import letschat.storage.Storage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,8 +32,13 @@ public class NettyServer {
 
     static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    public static Storage storage = null;
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        if (storage == null) {
+            storage = new RocksDBStorage("/tmp/letschat/");
+        }
+
         NioEventLoopGroup boosGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -67,11 +76,12 @@ public class NettyServer {
 //                pipeline.addLast("decoder", new StringDecoder());
 //                pipeline.addLast("encoder", new StringEncoder());
                 pipeline.addLast(new ProtobufVarint32FrameDecoder());
-                pipeline.addLast(new ProtobufDecoder(MessageProto.MessageTest.getDefaultInstance()));
-
+               // pipeline.addLast(new ProtobufDecoder(MessageProto.MessageTest.getDefaultInstance()));
+                pipeline.addLast(new ProtobufDecoder(RequestProtos.Request.getDefaultInstance()));
+                pipeline.addLast(new ProtobufDecoder(ResponseProtos.Response.getDefaultInstance()));
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast(new ProtobufEncoder());
-                pipeline.addLast(new TestServerHandler(channels));
+                pipeline.addLast(new ServerHandler(channels));
 
             }
         });

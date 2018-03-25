@@ -10,6 +10,7 @@ public class RocksDBStorage extends Storage<String, String> {
 
     public RocksDBStorage(String directory) {
         this.directory = directory;
+        initialize();
     }
 
     public boolean initialize() {

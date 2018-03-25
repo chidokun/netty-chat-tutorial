@@ -1,69 +1,91 @@
 package letschat.server;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import letschat.protobuf.MessageProto;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.group.ChannelGroup;
+import letschat.protobuf.RequestProtos;
+import letschat.protobuf.ResponseProtos;
+import letschat.storage.RocksDBStorage;
 
-public class ServerHandler extends ChannelInboundHandlerAdapter {
+public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Request> {
+    private ChannelGroup group;// = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-//    @Override
-//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-//        System.out.println("new client: " + ctx.channel().remoteAddress());
-//        LoopBackTimeStamp ts = (LoopBackTimeStamp) msg;
-//        ts.setRecvTimeStamp(System.nanoTime());
-//        System.out.println(LocalDateTime.now() +"loop delay in ms : " + 1.0 * ts.timeLapseInNanoSecond() / 1000000L);
-//    }
-//
-//    // Here is how we send out heart beat for idle to long
-//    @Override
-//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-//        if (evt instanceof IdleStateEvent) {
-//            IdleStateEvent event = (IdleStateEvent) evt;
-//            if (event.state() == IdleState.ALL_IDLE) { // idle for no read and write
-//                ctx.writeAndFlush(new LoopBackTimeStamp());
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-//        // Close the connection when an exception is raised.
-//        cause.printStackTrace();
-//        ctx.close();
-//    }
-
-    //EchoServer:
-//    @Override
-//    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-//        System.out.println("Receive from: " + ctx.channel().remoteAddress());
-//        ByteBuf in = (ByteBuf) msg;
-//        String mess =  "Da nhan duoc: " + in.toString(CharsetUtil.UTF_8);
-//
-//        System.out.println("Server received: " + in.toString(CharsetUtil.UTF_8));
-////        ctx.writeAndFlush(in);
-//        ctx.writeAndFlush(Unpooled.copiedBuffer(mess, CharsetUtil.UTF_8));
-//
-//    }
-
+    public ServerHandler(ChannelGroup group) {
+        this.group = group;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+//        ctx.channel().id();
+        group.add(ctx.channel());
         System.out.println("Client " + ctx.channel().remoteAddress() + " connected");
     }
 
-    //String Encode Decode
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, RequestProtos.Request request) throws Exception {
         System.out.println("Receive from: " + ctx.channel().remoteAddress());
-        MessageProto.MessageTest rec = (MessageProto.MessageTest) msg;
-        String recContent = rec.getContent();
-        String mess = "Da nhan duoc: " +  recContent;
-        System.out.println("Server received: " + msg);
-        ;
-        ctx.write(rec.newBuilderForType().setContent(mess).build());
+
+        String msg = request.getUser().getUsername();
+        String mess = "Da nhan duoc: " +  msg;
+        System.out.println("Server received: " + request);
+        ResponseProtos.Response.Builder responseBuilder = ResponseProtos.Response.newBuilder();
+        ResponseProtos.Response response = null;
+        if (NettyServer.storage == null) {
+            NettyServer.storage = new RocksDBStorage("/tmp/letschat");
+        }
+
+        switch (request.getType()) {
+            // ================= LOGIN ==================
+            case 0:
+                String user = request.getUser().getUsername();
+                String pass = request.getUser().getPassword();
+                if (pass != null && pass.equals(NettyServer.storage.get("user." + user + ".pass"))) {
+                    // đúng pass, trả về thành công và token
+                    String token = "";
+                    response = responseBuilder.setType(0).setCode(0).setToken(token).build();
+                    ctx.write(response);
+                } else {
+                    // sai pass, trả về response lỗi
+                    response = responseBuilder.setType(0).setCode(3).build();
+                    ctx.write(response);
+                }
+                break;
+            case 1:
+                // ================= SIGN UP ==================
+                String usersu = request.getUser().getUsername();
+                String passsu = request.getUser().getPassword();
+                if (NettyServer.storage.contains("user." + usersu + ".pass")) {
+                    // đã có pass, chứng tỏ đãđăng ký rồi, trả vềlỗi
+                    response = responseBuilder.setType(1).setCode(1).build();
+                    ctx.write(response);
+                } else {
+                    // lưu xuống db
+                    NettyServer.storage.put("user." + usersu + ".pass", passsu);
+                    // tra ve thanh cong
+                    response = responseBuilder.setType(1).setCode(0).build();
+                    ctx.write(response);
+                }
+                break;
+            case 2:
+                // ================= LOGOUT ==================
+                //xac nhan client da log out khoi he thong
+
+                //tra ve log out thanh cong
+                response = responseBuilder.setType(2).setCode(0).build();
+                ctx.write(response);
+
+                // neu co loi tra ve loi
+                break;
+            case 3:
+                // ================= CHAT TO USER ==================
+                break;
+
+            default:
+                break;
+        }
+
+        //ctx.write();
 //        ctx.writeAndFlush(Unpooled.copiedBuffer(mess, CharsetUtil.UTF_8));
-
-
     }
 
     @Override
@@ -72,12 +94,4 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         ctx.flush();
 //        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
-
 }
