@@ -2,10 +2,7 @@ package letschat.server;
 
 import NettyLoopBack.TestServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,9 +24,13 @@ import letschat.storage.Storage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NettyServer {
 
+    public static Map<String, ChannelId> userMap = new ConcurrentHashMap<>();
+    public static Map<ChannelId, String> userMapReverse = new ConcurrentHashMap<>();
     static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     public static Storage storage = null;
@@ -81,7 +82,7 @@ public class NettyServer {
                 pipeline.addLast(new ProtobufDecoder(ResponseProtos.Response.getDefaultInstance()));
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast(new ProtobufEncoder());
-                pipeline.addLast(new ServerHandler(channels));
+                pipeline.addLast(new ServerHandler(channels, userMap, userMapReverse, storage));
 
             }
         });

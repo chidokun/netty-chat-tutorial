@@ -5,14 +5,18 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import letschat.protobuf.ResponseProtos;
 
-public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Response> {
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Response> {
+    private DateFormat fm = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]");
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ResponseProtos.Response response) {
 
         switch (response.getType()) {
-            // ================= LOGIN ==================
             case 0:
+                // ================= LOGIN ==================
                 if (response.getCode() == 0) {
                     System.out.println("Login successfully!\n");
                     NettyClient.isLogin = true;
@@ -45,9 +49,26 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                 }
                 break;
             case 3:
-                // ================= CHAT TO USER ==================
-                break;
+                // ================= CHAT TO USER ====================
+                if (response.getCode() != 0) {
+                    System.out.println("Send message unsuccessfully!\n");
+                } else {
+                    if (!response.getUsermessage().getFromuser().equals(NettyClient.currentUserName)) {
+                        System.out.printf("%s[%s]: %s\n", fm.format(new Date(response.getUsermessage().getTime())),
+                                response.getUsermessage().getFromuser(), response.getUsermessage().getMessage());
+                    }
+                }
 
+                break;
+            case 4:
+                // ================= CHECK USER NAME ==================
+                if (response.getCode() == 0) {
+                    NettyClient.isValidUserName = true;
+                } else {
+                    System.out.println("User name is invalid! Type \":b\" to go back!");
+                    NettyClient.toUserName = "";
+                }
+                break;
             default:
                 break;
         }

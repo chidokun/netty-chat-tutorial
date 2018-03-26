@@ -19,12 +19,15 @@ public class NettyClient {
     private static String host = "localhost";
     private static int port = 8080;
     private static Scanner in = new Scanner(System.in);
-    private static Channel[] channel = {null};
+    private static Channel channel;
     public static boolean isLogin = false;
     public static String token = "";
     public static String currentUserName = "";
+    public static String toUserName = "";
+    public static boolean isValidUserName = false;
     private static Bootstrap bootstrap = null;
     private static NioEventLoopGroup workerGroup = null;
+    private static RequestProtos.Request.Builder requestBuilder = RequestProtos.Request.newBuilder();
 
     public static void main(String[] args) throws InterruptedException {
         workerGroup = new NioEventLoopGroup();
@@ -36,8 +39,6 @@ public class NettyClient {
             public void initChannel(SocketChannel ch) throws Exception {
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new ProtobufVarint32FrameDecoder());
-                //pipeline.addLast(new ProtobufDecoder(MessageProto.MessageTest.getDefaultInstance()));
-
                 pipeline.addLast(new ProtobufDecoder(ResponseProtos.Response.getDefaultInstance()));
                 pipeline.addLast(new ProtobufDecoder(RequestProtos.Request.getDefaultInstance()));
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
@@ -45,7 +46,6 @@ public class NettyClient {
                 pipeline.addLast(new ClientHandler());
             }
         });
-
 
         System.out.println("LET'S CHAT\n======================");
 
@@ -89,7 +89,7 @@ public class NettyClient {
                         System.out.printf("You logged in with name [%s]!\n\n", currentUserName);
                     }
                     break;
-                case ":ctu":
+                case ":c":
                     if (isLogin) {
                         showUserChat();
                     } else {
@@ -147,7 +147,7 @@ public class NettyClient {
             System.out.printf("Connecting to %s/%d ... ", host, port);
 
             if (future.await().isSuccess()) {
-                channel[0] = future.sync().channel();
+                channel = future.sync().channel();
                 return true;
             } else {
                 return false;
@@ -164,11 +164,7 @@ public class NettyClient {
         System.out.printf("\t%-10s%s\n", ":lg", "Login");
         System.out.printf("\t%-10s%s\n", ":lo", "Logout");
         System.out.printf("\t%-10s%s\n", ":su", "Sign up");
-        System.out.printf("\t%-10s%s\n", ":ctu", "Chat to a user");
-        System.out.printf("\t%-10s%s\n", ":cc", "Create channel (under construction)");
-        System.out.printf("\t%-10s%s\n", ":jc", "Join channel (under construction)");
-        System.out.printf("\t%-10s%s\n", ":sc", "See list of channel you are following (under construction)");
-        System.out.printf("\t%-10s%s\n", ":ctc", "Chat to channel (under construction)");
+        System.out.printf("\t%-10s%s\n", ":c", "Chat to a user");
         System.out.printf("\t%-10s%s\n", ":b", "Back");
         System.out.printf("\t%-10s%s\n", ":q", "Quit");
         System.out.println();
@@ -189,7 +185,7 @@ public class NettyClient {
         String password = inputString("Password: ");
         if (password.contains(":b")) { return; }
 
-        RequestProtos.Request request = RequestProtos.Request.newBuilder()
+        RequestProtos.Request request = requestBuilder
                 .setType(0)
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(userName)
@@ -200,7 +196,7 @@ public class NettyClient {
         System.out.printf("Logging in user [%s]...\n", userName);
         currentUserName = userName;
 
-        channel[0].writeAndFlush(request).await();
+        channel.writeAndFlush(request).await();
     }
 
     public static void showSignUp() throws InterruptedException {
@@ -210,7 +206,7 @@ public class NettyClient {
         if (password.contains(":b")) { return; }
 
 
-        RequestProtos.Request request = RequestProtos.Request.newBuilder()
+        RequestProtos.Request request = requestBuilder
                 .setType(1)
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(userName)
@@ -221,19 +217,55 @@ public class NettyClient {
         System.out.printf("Signing up for user [%s]...\n", userName);
         currentUserName = userName;
 
-        channel[0].writeAndFlush(request).await();
-    }
-
-    public static void showUserChat() {
-        System.out.print("User name: ");
+        channel.writeAndFlush(request).await();
     }
 
     public static void logOut() throws InterruptedException {
         RequestProtos.Request request = RequestProtos.Request.newBuilder()
                 .setType(2)
+                .setName(currentUserName)
                 .setToken(token)
                 .build();
 
-        channel[0].writeAndFlush(request).await();
+        channel.writeAndFlush(request).await();
+    }
+
+    public static void showUserChat() throws InterruptedException {
+        String userName = inputString("User name: ");
+        if (userName.contains(":b")) { return; }
+        toUserName = userName;
+
+        // check username is valid
+        RequestProtos.Request request = requestBuilder
+                .setType(4)
+                .setName(userName)
+                .setToken(token)
+                .build();
+
+        channel.writeAndFlush(request).await();
+
+        showChatBox();
+    }
+
+    public static void showChatBox() throws InterruptedException {
+        System.out.println("Let start! Type and press \"Enter\" to send message!\n");
+        String message;
+        while (true) {
+            message = inputString("~~> ");
+            if (message.trim().equals(":b")) { return; }
+
+            // send message
+            RequestProtos.Request request = requestBuilder
+                    .setType(3)
+                    .setChattouser(RequestProtos.ChatToUser.newBuilder()
+                        .setFromuser(currentUserName)
+                        .setTouser(toUserName)
+                        .setMessage(message)
+                        .setTime(System.currentTimeMillis()))
+                    .setToken(token)
+                    .build();
+
+            channel.writeAndFlush(request).await();
+        }
     }
 }
