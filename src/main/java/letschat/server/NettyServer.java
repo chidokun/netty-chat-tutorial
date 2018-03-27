@@ -1,6 +1,5 @@
 package letschat.server;
 
-import NettyLoopBack.TestServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
@@ -15,15 +14,12 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import letschat.protobuf.MessageProto;
 import letschat.protobuf.RequestProtos;
 import letschat.protobuf.ResponseProtos;
 import letschat.storage.RocksDBStorage;
 import letschat.storage.Storage;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,11 +29,11 @@ public class NettyServer {
     public static Map<ChannelId, String> userMapReverse = new ConcurrentHashMap<>();
     static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    public static Storage storage = null;
+    public static Storage<String, String> storage = null;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (storage == null) {
-            storage = new RocksDBStorage("/tmp/letschat/");
+            storage = new RocksDBStorage("tmp");
         }
 
         NioEventLoopGroup boosGroup = new NioEventLoopGroup();
@@ -77,7 +73,7 @@ public class NettyServer {
 //                pipeline.addLast("decoder", new StringDecoder());
 //                pipeline.addLast("encoder", new StringEncoder());
                 pipeline.addLast(new ProtobufVarint32FrameDecoder());
-               // pipeline.addLast(new ProtobufDecoder(MessageProto.MessageTest.getDefaultInstance()));
+                // pipeline.addLast(new ProtobufDecoder(MessageProto.MessageTest.getDefaultInstance()));
                 pipeline.addLast(new ProtobufDecoder(RequestProtos.Request.getDefaultInstance()));
                 pipeline.addLast(new ProtobufDecoder(ResponseProtos.Response.getDefaultInstance()));
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
@@ -92,26 +88,26 @@ public class NettyServer {
 
         Channel channel = bootstrap.bind(8080).sync().channel();
         System.out.println(channel.id());
-        MessageProto.MessageTest mess;
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
-            try {
-//                System.out.println("Go vao: " + in.readLine());
-                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
-                System.out.println("write to: " + channel.remoteAddress());
-//                channel.writeAndFlush(in.readLine() );
-//                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
-                channel.writeAndFlush(mess);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            for (Channel ch : channels) {
-                //do something with ch object :)
-                System.out.println("Channel in group: " + ch);
-            }
-
-        }
+//        MessageProto.MessageTest mess;
+//        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//        while (true) {
+//            try {
+////                System.out.println("Go vao: " + in.readLine());
+//                mess = MessageProto.MessageTest.newBuilder().setContent(in.readLine()).build();
+//                System.out.println("write to: " + channel.remoteAddress());
+////                channel.writeAndFlush(in.readLine() );
+////                channel.writeAndFlush(Unpooled.copiedBuffer(in.readLine(), CharsetUtil.UTF_8));
+//                channel.writeAndFlush(mess);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            for (Channel ch : channels) {
+//                //do something with ch object :)
+//                System.out.println("Channel in group: " + ch);
+//            }
+//
+//        }
     }
 }
 

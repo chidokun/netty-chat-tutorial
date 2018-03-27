@@ -113,12 +113,29 @@ public class NettyClient {
                 case ":b":
                     System.out.println("Nothing to back!\n");
                     break;
+                case ":gm":
+                    getMessages();
+                    System.out.println("Get messages");
+                    break;
                 case "":
                     break;
                 default:
                     System.out.println("Invalid command. Type \":h\" for help!\n");
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void getMessages() {
+        RequestProtos.Request request = requestBuilder
+                .setType(RequestProtos.RequestType.GETMESSAGE)//5
+                .setToken(token)
+                .build();
+
+        try {
+            channel.writeAndFlush(request).await();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -149,13 +166,11 @@ public class NettyClient {
             if (future.await().isSuccess()) {
                 channel = future.sync().channel();
                 return true;
-            } else {
-                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     public static void showHelp() {
@@ -186,7 +201,7 @@ public class NettyClient {
         if (password.contains(":b")) { return; }
 
         RequestProtos.Request request = requestBuilder
-                .setType(0)
+                .setType(RequestProtos.RequestType.LOGIN)//0)
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(userName)
                         .setPassword(password)
@@ -207,7 +222,7 @@ public class NettyClient {
 
 
         RequestProtos.Request request = requestBuilder
-                .setType(1)
+                .setType(RequestProtos.RequestType.SIGNUP)//1)
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(userName)
                         .setPassword(password)
@@ -222,7 +237,7 @@ public class NettyClient {
 
     public static void logOut() throws InterruptedException {
         RequestProtos.Request request = RequestProtos.Request.newBuilder()
-                .setType(2)
+                .setType(RequestProtos.RequestType.LOGOUT)//2)
                 .setName(currentUserName)
                 .setToken(token)
                 .build();
@@ -237,7 +252,7 @@ public class NettyClient {
 
         // check username is valid
         RequestProtos.Request request = requestBuilder
-                .setType(4)
+                .setType(RequestProtos.RequestType.USERS)//4)
                 .setName(userName)
                 .setToken(token)
                 .build();
@@ -256,7 +271,7 @@ public class NettyClient {
 
             // send message
             RequestProtos.Request request = requestBuilder
-                    .setType(3)
+                    .setType(RequestProtos.RequestType.CHATBOX)//3)
                     .setChattouser(RequestProtos.ChatToUser.newBuilder()
                         .setFromuser(currentUserName)
                         .setTouser(toUserName)

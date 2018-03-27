@@ -69,6 +69,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                     NettyClient.toUserName = "";
                 }
                 break;
+
             default:
                 break;
         }

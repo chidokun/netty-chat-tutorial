@@ -42,7 +42,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
 
         switch (request.getType()) {
             // ================= LOGIN ==================
-            case 0:
+            case LOGIN:
                 userName = request.getUser().getUsername();
                 password = request.getUser().getPassword();
                 if (password != null && password.equals(this.storage.get("user." + userName + ".pass"))) {
@@ -59,12 +59,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                 }
                 System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
                 break;
-            case 1:
+            case SIGNUP:
                 // ================= SIGN UP ==================
                 userName = request.getUser().getUsername();
                 password = request.getUser().getPassword();
                 if (this.storage.contains("user." + userName + ".pass")) {
-                    // đã có pass, chứng tỏ đãđăng ký rồi, trả vềlỗi
+                    // đã có pass, chứng tỏ đã đăng ký rồi, trả về lỗi
                     response = responseBuilder.setType(1).setCode(1).build();
                     ctx.write(response);
                 } else {
@@ -76,7 +76,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                 }
                 System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
                 break;
-            case 2:
+            case LOGOUT:
                 // ================= LOGOUT ==================
                 if (!Authentication.verifyToken(userMapReverse.get(ctx.channel().id()), request.getToken())) {
                     response = responseBuilder.setType(2).setCode(3).build();
@@ -88,7 +88,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                 ctx.write(response);
                 System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
                 break;
-            case 3:
+            case CHATBOX:
                 // ================= CHAT TO USER ==================
                 //check token hop75 le65
                 if (!Authentication.verifyToken(userMapReverse.get(ctx.channel().id()), request.getToken())) {
@@ -105,21 +105,33 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .setUsermessage(ResponseProtos.UserMessage.newBuilder()
                                     .setFromuser(request.getChattouser().getFromuser())
                                     .setTouser(request.getChattouser().getTouser())
-                                    .setMessage(request.getChattouser().getMessage())
+                                    .setMessage(request.getChattouser().getFromuser() + " " + request.getChattouser().getMessage())
                                     .setTime(request.getChattouser().getTime()))
                             .build();
 
                     Channel channel = this.group.find(this.userMap.get(request.getChattouser().getTouser()));
+
                     if (channel != null) {
                         System.out.printf("Send to [%s]:\n%s\n", channel.remoteAddress(), response);
                         channel.writeAndFlush(response);
+                    } else { // user chua dang nhap, luu xuong db
+
+                        String storedKey = "user." + request.getChattouser().getTouser() + ".receive";
+                        int sequenceNumber = 0;
+                        if (this.storage.contains(storedKey)) {
+                            sequenceNumber = Integer.parseInt(this.storage.get(storedKey).toString()) + 1;
+
+                            this.storage.remove(storedKey);
+                        }
+                        this.storage.put(storedKey, Integer.toString(sequenceNumber + 1));
+                        this.storage.put(storedKey + Integer.toString(sequenceNumber),response.getUsermessage().getMessage());
                     }
                 }
 
                 System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
                 ctx.write(response);
                 break;
-            case 4:
+            case USERS:
                 // ================= CHECK USER NAME ==================
                 userName = request.getName();
                 if (!Authentication.verifyToken(userMapReverse.get(ctx.channel().id()), request.getToken())) {
@@ -131,6 +143,27 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                 }
                 ctx.write(response);
                 System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
+                break;
+            case GETMESSAGE:
+                String storedKey = "user." + this.userMapReverse.get(ctx.channel().id()) + ".receive";
+
+                if (this.storage.contains(storedKey)) {
+                    int messageNumber = Integer.parseInt(this.storage.get(storedKey).toString());
+                    for (int i = 0; i < messageNumber; i++) {
+
+                        response = responseBuilder.setType(3)
+                                .setCode(0)
+                                .setUsermessage(ResponseProtos.UserMessage.newBuilder()
+
+                                        //.setFromuser(request.getChattouser().getFromuser())
+                                        .setTouser(request.getChattouser().getTouser())
+                                        .setMessage(request.getChattouser().getFromuser() + " " + request.getChattouser().getMessage())
+                                        .setTime(request.getChattouser().getTime()))
+                                .build();
+                        ctx.writeAndFlush(response);
+                        System.out.printf("Send to " + ctx.channel().remoteAddress() + response);
+                    }
+                }
                 break;
             default:
                 break;

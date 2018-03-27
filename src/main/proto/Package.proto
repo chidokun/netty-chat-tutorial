@@ -1,0 +1,37 @@
+//syntax = "proto2";
+//
+//package letschat.protobuf;
+//
+//option java_package = "letschat.protobuf";
+//option java_outer_classname = "PackageProtos";
+//
+//
+////message ChatToUser {
+////    required string fromuser = 1;
+////    required string touser = 2;
+////    required string message = 3;
+////    required int64 time = 4;
+////}
+////
+//enum PackageType {
+//    LOGIN   = 0;
+//    SIGNUP  = 1;
+//    LOGOUT  = 2;
+//    CHATBOX = 3;
+//    USERS   = 4;
+//
+//}
+//
+//message Login {
+//    required string username = 1;
+//    required string password = 2;
+//}
+//
+//message Package {
+//    required PackageType type = 1;
+//
+////    optional User user = 2;
+////    optional ChatToUser chattouser = 3;
+////    optional string token = 4;
+////    optional string name = 5;
+//}
