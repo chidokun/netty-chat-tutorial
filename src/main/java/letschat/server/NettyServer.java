@@ -33,7 +33,7 @@ public class NettyServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (storage == null) {
-            storage = new RocksDBStorage("tmp");
+            storage = new RocksDBStorage("/tmp/letschat/");
         }
 
         NioEventLoopGroup boosGroup = new NioEventLoopGroup();

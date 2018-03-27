@@ -12,11 +12,11 @@ message UserMessage {
     required int64  time        = 4;
 }
 
-enum ResponseType {
+enum CodeType {
     SUCCESS = 0;
-    ERROR   = 1;
-    TOKEN   = 2;
-    TOUSER  = 3;
+    DUPLICATE   = 1;
+    NOTLOGIN   = 2;
+    ERROR  = 3;
 }
 
 message Response {

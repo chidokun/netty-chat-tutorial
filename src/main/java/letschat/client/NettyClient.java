@@ -114,8 +114,32 @@ public class NettyClient {
                     System.out.println("Nothing to back!\n");
                     break;
                 case ":gm":
-                    getMessages();
-                    System.out.println("Get messages");
+                    if (isLogin) {
+                        getMessages();
+                    } else {
+                        System.out.println("Please login first!\n");
+                    }
+                    break;
+                case ":j":
+                    if (isLogin) {
+                        joinChannel();
+                    } else {
+                        System.out.println("Please login first!\n");
+                    }
+                    break;
+                case ":l":
+                    if (isLogin) {
+                        listChannel();
+                    } else {
+                        System.out.println("Please login first!\n");
+                    }
+                    break;
+                case ":x":
+                    if (isLogin) {
+                        exitChannel();
+                    } else {
+                        System.out.println("Please login first!\n");
+                    }
                     break;
                 case "":
                     break;
@@ -127,7 +151,47 @@ public class NettyClient {
         }
     }
 
+    private static void exitChannel() {
+    }
+
+    private static void listChannel() {
+
+    }
+
+    private static void joinChannel() throws InterruptedException {
+        String userName = inputString("Channel: ");
+        if (userName.contains(":b")) { return; }
+
+        //gui request join kenh
+//        RequestProtos.Request request = requestBuilder
+//                .setType(6)//5
+//
+//                .setToken(token)
+//                .build();
+
+        // lap nhan gui tin nhan
+        String message;
+        while (true) {
+            message = inputString("");
+            if (message.trim().equals(":b")) { return; }
+
+            // send message
+            RequestProtos.Request request = requestBuilder
+                    .setType(RequestProtos.RequestType.CHATBOX)//3)
+                    .setChattouser(RequestProtos.ChatToUser.newBuilder()
+                            .setFromuser(currentUserName)
+                            .setTouser(toUserName)
+                            .setMessage(message)
+                            .setTime(System.currentTimeMillis()))
+                    .setToken(token)
+                    .build();
+
+            channel.writeAndFlush(request).await();
+        }
+    }
+
     private static void getMessages() {
+        System.out.println("Get messages");
         RequestProtos.Request request = requestBuilder
                 .setType(RequestProtos.RequestType.GETMESSAGE)//5
                 .setToken(token)
@@ -179,7 +243,11 @@ public class NettyClient {
         System.out.printf("\t%-10s%s\n", ":lg", "Login");
         System.out.printf("\t%-10s%s\n", ":lo", "Logout");
         System.out.printf("\t%-10s%s\n", ":su", "Sign up");
-        System.out.printf("\t%-10s%s\n", ":c", "Chat to a user");
+        System.out.printf("\t%-10s%s\n", ":c", "Chat to a user or channel");
+        System.out.printf("\t%-10s%s\n", ":gm", "Get message when offline");
+        System.out.printf("\t%-10s%s\n", ":j", "Join a channel");
+        System.out.printf("\t%-10s%s\n", ":l", "List of current channels");
+        System.out.printf("\t%-10s%s\n", ":x", "Exit a channel");
         System.out.printf("\t%-10s%s\n", ":b", "Back");
         System.out.printf("\t%-10s%s\n", ":q", "Quit");
         System.out.println();
