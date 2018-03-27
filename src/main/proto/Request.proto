@@ -17,14 +17,17 @@ message ChatToUser {
     required int64  time = 4;
 }
 enum RequestType {
-    LOGIN   = 0;
-    SIGNUP  = 1;
-    LOGOUT  = 2;
-    CHATBOX = 3;
-    USERS   = 4;
-    GETMESSAGE = 5;
-
+    LOGIN       = 0;
+    SIGNUP      = 1;
+    LOGOUT      = 2;
+    CHATBOX     = 3;
+    USERS       = 4;
+    GETMESSAGE  = 5;
+    JOINCHANNEL = 6;
+    LISTCHANNEL = 7;
+    EXITCHANNEL = 8;
 }
+
 message Request {
     required RequestType type = 1;
     optional User       user = 2;

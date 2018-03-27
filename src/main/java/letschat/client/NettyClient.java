@@ -10,12 +10,18 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import letschat.client.ClientHandler;
+import letschat.common.Constant;
 import letschat.protobuf.RequestProtos;
 import letschat.protobuf.ResponseProtos;
 
 import java.util.Scanner;
 
+import static letschat.common.Constant.HELP;
+import static letschat.common.Constant.SIGNUP;
+
 public class NettyClient {
+
+
     private static String host = "localhost";
     private static int port = 8080;
     private static Scanner in = new Scanner(System.in);
@@ -72,48 +78,48 @@ public class NettyClient {
     public static void mainProgram(String command) {
         try {
 
-            if (command.equals(":q")) {
+            if (command.equalsIgnoreCase(":q")) {
                 System.out.println("Good bye!");
                 workerGroup.shutdownGracefully();
                 System.exit(0);
             }
 
             switch (command) {
-                case ":h":
+                case Constant.HELP:
                     showHelp();
                     break;
-                case ":lg":
+                case Constant.LOGIN:
                     if (!isLogin) {
                         showLogin();
                     } else {
                         System.out.printf("You logged in with name [%s]!\n\n", currentUserName);
                     }
                     break;
-                case ":c":
+                case Constant.CHAT:
                     if (isLogin) {
                         showUserChat();
                     } else {
                         System.out.println("Please login first!\n");
                     }
                     break;
-                case ":lo":
+                case Constant.LOGOUT:
                     if (isLogin) {
                         logOut();
                     } else {
                         System.out.println("Please login first!\n");
                     }
                     break;
-                case ":su":
+                case Constant.SIGNUP:
                     if (!isLogin) {
                         showSignUp();
                     } else {
                         System.out.println("Please log out first!\n");
                     }
                     break;
-                case ":b":
+                case Constant.BACK:
                     System.out.println("Nothing to back!\n");
                     break;
-                case ":gm":
+                case Constant.GETMESSAGE:
                     getMessages();
                     System.out.println("Get messages");
                     break;
@@ -140,7 +146,7 @@ public class NettyClient {
         }
     }
 
-    public static boolean connect(Bootstrap b) {
+    private static boolean connect(Bootstrap b) {
         try {
             System.out.print("Host: ");
             String _host = in.nextLine();
@@ -279,7 +285,6 @@ public class NettyClient {
                         .setTime(System.currentTimeMillis()))
                     .setToken(token)
                     .build();
-
             channel.writeAndFlush(request).await();
         }
     }
