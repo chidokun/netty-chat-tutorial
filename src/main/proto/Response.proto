@@ -5,23 +5,23 @@ package letschat.protobuf;
 option java_package = "letschat.protobuf";
 option java_outer_classname = "ResponseProtos";
 
-message UserMessage {
-    optional string fromuser    = 1;
-    required string touser      = 2;
-    required string message     = 3;
-    required int64  time        = 4;
+message Message {
+    optional string from    = 1;
+    required string content = 2;
 }
 
-enum CodeType {
-    SUCCESS = 0;
-    DUPLICATE   = 1;
-    NOTLOGIN   = 2;
-    ERROR  = 3;
+enum ResponseType {
+    SUCCESS     = 1; //SIGN UP succesfuly
+    FAILURE     = 2;
+    NOTLOGIN    = 3;
+    TOKEN       = 4;
+    MESSAGE     = 5;
+    DUPLICATE   = 6;
 }
 
 message Response {
-    required int32       type        = 1;
-    required int32       code        = 2;
-    optional string      token       = 3;
-    optional UserMessage usermessage = 4;
+    required ResponseType   type    = 1;
+    optional string         token   = 2;
+    optional Message        message = 3;
+    optional int64          time    = 4;
 }

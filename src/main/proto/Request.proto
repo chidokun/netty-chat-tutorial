@@ -5,35 +5,37 @@ package letschat.protobuf;
 option java_package = "letschat.protobuf";
 option java_outer_classname = "RequestProtos";
 
-message User {
+enum RequestType {
+    SIGNUP      = 0;
+    LOGIN       = 1;
+    LOGOUT      = 2;
+    CHAT        = 3;
+    GETMESSAGE  = 4;
+    JOINCHANNEL = 5;
+    LISTCHANNEL = 6;
+    EXITCHANNEL = 7;
+}
+
+message User { //use for sign up or login
     required string username = 1;
     required string password = 2;
 }
 
-message ChatToUser {
-    required string fromuser = 1;
-    required string touser = 2;
-    required string message = 3;
-    required int64  time = 4;
+message Chat {
+    required string to      = 1;
+    required string message = 2;
 }
-enum RequestType {
-    LOGIN       = 0;
-    SIGNUP      = 1;
-    LOGOUT      = 2;
-    CHATBOX     = 3;
-    USERS       = 4;
-    GETMESSAGE  = 5;
-    JOINCHANNEL = 6;
-    LISTCHANNEL = 7;
-    EXITCHANNEL = 8;
+
+message Channel {
+    required string name = 1;
 }
 
 message Request {
-    required RequestType type = 1;
-    optional User       user = 2;
-    optional ChatToUser chattouser = 3;
-    optional string     token = 4;
-    optional string     name = 5;
+    required RequestType    type    = 1;
+    required string         token   = 2;
+    optional User           user    = 3;
+    optional Chat           chat    = 4;
+    optional Channel        channel = 5;
 }
 
 //Fix

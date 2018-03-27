@@ -48,7 +48,7 @@ public class NettyServer {
         // 1. define a separate thread pool to execute handlers with
         //    slow business logic. e.g database operation
         // ===========================================================
-        final EventExecutorGroup group = new DefaultEventExecutorGroup(1500); //thread pool of 1500
+        final EventExecutorGroup group = new DefaultEventExecutorGroup(10); //thread pool of 1500
 
         bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             //            @Override
@@ -79,7 +79,6 @@ public class NettyServer {
                 pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast(new ProtobufEncoder());
                 pipeline.addLast(new ServerHandler(channels, userMap, userMapReverse, storage));
-
             }
         });
 
