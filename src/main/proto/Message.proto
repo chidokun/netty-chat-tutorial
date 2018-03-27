@@ -1,6 +1,0 @@
-syntax = "proto2";
-package letschat.protobuf;
-option java_outer_classname = "MessageProto";
-message MessageTest {
-    required string content = 1;
-}
