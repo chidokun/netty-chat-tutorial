@@ -152,18 +152,33 @@ public class NettyClient {
         }
     }
 
-    private static void exitChannel() {
+    private static void exitChannel() throws InterruptedException {
+        String channelName = inputString("Channel: ");
+        if (channelName.contains(":b")) { return; }
+
+        // gui request exit kenh
+        RequestProtos.Request request = requestBuilder
+                .setType(RequestProtos.RequestType.EXITCHANNEL)//5
+                .setName(channelName)
+                .setToken(token)
+                .build();
+        channel.writeAndFlush(request).await();
     }
 
-    private static void listChannel() {
-
+    private static void listChannel() throws  InterruptedException{
+        //gui request list kenh
+        RequestProtos.Request request = requestBuilder
+                .setType(RequestProtos.RequestType.LISTCHANNEL)//5
+                .setToken(token)
+                .build();
+        channel.writeAndFlush(request).await();
     }
 
     private static void joinChannel() throws InterruptedException {
         String channelName = inputString("Channel: ");
         if (channelName.contains(":b")) { return; }
 
-        //gui request join kenh
+        // gui request join kenh
         RequestProtos.Request request = requestBuilder
                 .setType(RequestProtos.RequestType.JOINCHANNEL)//5
                 .setName(channelName)
@@ -182,7 +197,7 @@ public class NettyClient {
                     .setType(RequestProtos.RequestType.CHATBOX)//3)
                     .setChattouser(RequestProtos.ChatToUser.newBuilder()
                             .setFromuser(currentUserName)
-                            .setTouser(channel)
+                            .setTouser(channelName)
                             .setMessage(message)
                             .setTime(System.currentTimeMillis()))
                     .setToken(token)
