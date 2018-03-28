@@ -15,8 +15,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
+import static letschat.common.Constant.NOTHING;
+
 public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Response> {
-    private DateFormat fm = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]");
+    private static DateFormat fm = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]");
     private static Scanner in = new Scanner(System.in);
     private static RequestProtos.Request.Builder requestBuilder = RequestProtos.Request.newBuilder();
     private static String token = "";
@@ -141,7 +143,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                     break;
                 case Constant.CHAT:
                     showUserChat();
-
                     break;
                 case Constant.LOGOUT:
                     logOut();
@@ -163,7 +164,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                     break;
                 case Constant.EXITCHANNEL:
                     exitChannel();
-                case "":
+                case Constant.NOTHING:
                     break;
                 default:
                     System.out.println("Invalid command. Type \":h\" for help!\n");
@@ -186,7 +187,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
         if (channelName.contains(":b")) {
             return;
         }
-
 
         // lap nhan gui tin nhan
         String message;
@@ -369,4 +369,62 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
             channel.writeAndFlush(request).await();
         }
     }
+//    private static void joinChannel() throws InterruptedException {
+//        String channelName = inputString("Channel: ");
+//        if (channelName.contains(":b")) {
+//            return;
+//        }
+//
+//        // gui request join kenh
+//        RequestProtos.Request request = requestBuilder
+//                .setType(RequestProtos.RequestType.JOINCHANNEL)//5
+//                .setName(channelName)
+//                .setToken(token)
+//                .build();
+//        channel.writeAndFlush(request).await();
+//
+//        // lap nhan gui tin nhan
+//        String message;
+//        while (true) {
+//            message = inputString("");
+//            if (message.trim().equals(":b")) {
+//                return;
+//            }
+//
+//            // send message
+//            request = requestBuilder
+//                    .setType(RequestProtos.RequestType.CHATBOX)//3)
+//                    .setChattouser(RequestProtos.ChatToUser.newBuilder()
+//                            .setFromuser(currentUserName)
+//                            .setTouser(channelName)
+//                            .setMessage(message)
+//                            .setTime(System.currentTimeMillis()))
+//                    .setToken(token)
+//                    .build();
+//        }
+//    }/
+
+//    private static void exitChannel() throws InterruptedException {
+//        String channelName = inputString("Channel: ");
+//        if (channelName.contains(":b")) {
+//            return;
+//        }
+//
+//        // gui request exit kenh
+//        RequestProtos.Request request = requestBuilder
+//                .setType(RequestProtos.RequestType.EXITCHANNEL)//5
+//                .setName(channelName)
+//                .setToken(token)
+//                .build();
+//        channel.writeAndFlush(request).await();
+//    }
+//
+//    private static void listChannel() throws InterruptedException {
+//        //gui request list kenh
+//        RequestProtos.Request request = requestBuilder
+//                .setType(RequestProtos.RequestType.LISTCHANNEL)//5
+//                .setToken(token)
+//                .build();
+//        channel.writeAndFlush(request).await();
+//    }
 }

@@ -13,5 +13,5 @@ public class Constant {
     public static final String JOINCHANNEL  = ":j";
     public static final String LISTCHANNEL  = ":l";
     public static final String EXITCHANNEL  = ":x";
-
+    public static final String NOTHING      = "";
 }

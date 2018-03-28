@@ -21,7 +21,7 @@ import static letschat.common.Constant.SIGNUP;
 
 public class NettyClient {
 
-//
+    //
 //    private static String host = "localhost";
 //    private static int port = 8080;
 //    private static String token = "";
@@ -68,40 +68,13 @@ public class NettyClient {
         while (true) {
             System.out.print("~> ");
             command = in.nextLine().trim();
-            if (!clientHandler.mainProgram(command)){
+            if (!clientHandler.mainProgram(command)) {
                 workerGroup.shutdownGracefully();
                 System.exit(0);
             }
 
         }
-<<<<<<< HEAD
-=======
-    }
 
-    private static void exitChannel() throws InterruptedException {
-        String channelName = inputString("Channel: ");
-        if (channelName.contains(":b")) { return; }
-
-        // gui request exit kenh
-        RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.EXITCHANNEL)//5
-                .setName(channelName)
-                .setToken(token)
-                .build();
-        channel.writeAndFlush(request).await();
-    }
->>>>>>> cf671a0b8f506e242bec1370e81a9cce2da4c75e
-
-    private static void listChannel() throws  InterruptedException{
-        //gui request list kenh
-        RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.LISTCHANNEL)//5
-                .setToken(token)
-                .build();
-        channel.writeAndFlush(request).await();
-    }
-
-<<<<<<< HEAD
 //    public static void mainProgram(String command) {
 //        try {
 //
@@ -347,35 +320,5 @@ public class NettyClient {
 //            channel.writeAndFlush(request).await();
 //        }
 //    }
-=======
-    private static void joinChannel() throws InterruptedException {
-        String channelName = inputString("Channel: ");
-        if (channelName.contains(":b")) { return; }
-
-        // gui request join kenh
-        RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.JOINCHANNEL)//5
-                .setName(channelName)
-                .setToken(token)
-                .build();
-        channel.writeAndFlush(request).await();
-
-        // lap nhan gui tin nhan
-        String message;
-        while (true) {
-            message = inputString("");
-            if (message.trim().equals(":b")) { return; }
-
-            // send message
-            request = requestBuilder
-                    .setType(RequestProtos.RequestType.CHATBOX)//3)
-                    .setChattouser(RequestProtos.ChatToUser.newBuilder()
-                            .setFromuser(currentUserName)
-                            .setTouser(channelName)
-                            .setMessage(message)
-                            .setTime(System.currentTimeMillis()))
-                    .setToken(token)
-                    .build();
->>>>>>> cf671a0b8f506e242bec1370e81a9cce2da4c75e
-
+    }
 }
