@@ -45,7 +45,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
     }
 
     private void signUp(RequestProtos.Request request) {
-        userName = request.getUser().getUsername();
+        String userName = request.getUser().getUsername();
         String password = request.getUser().getPassword();
         if (this.storage.contains("user." + userName + ".pass")) {
             // đã có pass, chứng tỏ đã đăng ký rồi, trả về lỗi
@@ -69,7 +69,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
     private void logIn(RequestProtos.Request request) {
         userName = request.getUser().getUsername();
         String password = request.getUser().getPassword();
-
+        if (userMapReverse.containsKey(ctx.channel().id())) {
+            response = responseBuilder
+                    .setType(ResponseProtos.ResponseType.FAILURE)
+                    .setMessage(ResponseProtos.Message.newBuilder()
+                            .setFrom("Server")
+                            .setContent("You have logged!")
+                            .build())
+                    .build();
+        } else
         if (password != null && password.equals(this.storage.get("user." + userName + ".pass"))) {
             // đúng pass, trả về thành công và token
             String token = Authentication.generateToken(userName);
