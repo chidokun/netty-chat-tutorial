@@ -101,7 +101,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .build())
                     .build();
         }
-
     }
 
     private void logOut(RequestProtos.Request request) {
