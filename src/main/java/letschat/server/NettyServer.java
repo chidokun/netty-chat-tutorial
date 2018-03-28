@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NettyServer {
 
-    public static Map<String, ChannelId> userMap = new ConcurrentHashMap<>();
-    public static Map<ChannelId, String> userMapReverse = new ConcurrentHashMap<>();
+    private static Map<String, ChannelId> userMap = new ConcurrentHashMap<>();
+    private static Map<ChannelId, String> userMapReverse = new ConcurrentHashMap<>();
     static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    public static Storage<String, String> storage = null;
+    private static Storage<String, String> storage = null;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (storage == null) {
