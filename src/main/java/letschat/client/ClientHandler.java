@@ -73,8 +73,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
 
             if (command.equalsIgnoreCase(":q")) {
                 System.out.println("Good bye!");
-//                workerGroup.shutdownGracefully();
-//                System.exit(0);
                 return false;
             }
 
@@ -176,7 +174,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
         System.out.printf("\t%-10s%s\n", ":lg", "Login");
         System.out.printf("\t%-10s%s\n", ":lo", "Logout");
         System.out.printf("\t%-10s%s\n", ":su", "Sign up");
-        System.out.printf("\t%-10s%s\n", ":c", "Chat to a user or channel");
+        System.out.printf("\t%-10s%s\n", ":c", "Chat to a user");
+        System.out.printf("\t%-10s%s\n", ":cc", "Chat to a channel");
         System.out.printf("\t%-10s%s\n", ":gm", "Get message when offline");
         System.out.printf("\t%-10s%s\n", ":j", "Join a channel");
         System.out.printf("\t%-10s%s\n", ":l", "List of current channels");
@@ -206,7 +205,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
         }
 
         RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.LOGIN)//0)
+                .setType(RequestProtos.RequestType.LOGIN)
                 .setToken(token)
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(usrName)
@@ -229,9 +228,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
             return;
         }
 
-
         RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.SIGNUP)//1)
+                .setType(RequestProtos.RequestType.SIGNUP)
                 .setToken("")
                 .setUser(RequestProtos.User.newBuilder()
                         .setUsername(userName)
@@ -265,10 +263,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                 return;
             }
 
-            // send message
-
             RequestProtos.Request request = requestBuilder
-                    .setType(RequestProtos.RequestType.CHAT)//4)
+                    .setType(RequestProtos.RequestType.CHAT)
                     .setToken(token)
                     .setChat(RequestProtos.Chat.newBuilder()
                             .setTo(userName)
@@ -285,47 +281,40 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
             return;
         }
 
-        // gui request join kenh
         RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.JOINCHANNEL)//5
+                .setType(RequestProtos.RequestType.JOINCHANNEL)
                 .setToken(token)
                 .setChannel(channelName)
                 .build();
-        channel.writeAndFlush(request).await();
 
-        // lap nhan gui tin nhan
-//
-//        }
+        channel.writeAndFlush(request).await();
     }
 
     private static void listChannel() throws InterruptedException {
-        //gui request list kenh
         RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.LISTCHANNEL)//5
+                .setType(RequestProtos.RequestType.LISTCHANNEL)
                 .setToken(token)
                 .build();
+
         channel.writeAndFlush(request).await();
     }
 
-    private static void chatChannel() {
+    private static void chatChannel() throws InterruptedException {
         String channelName = inputString("Channel: ");
         if (channelName.contains(":b")) {
             return;
         }
 
-
         System.out.println("Let start! Type and press \"Enter\" to send message!\n");
         String message;
         while (true) {
-
             message = inputString("~~> ");
             if (message.trim().equals(":b")) {
                 return;
             }
 
-            // send message
             RequestProtos.Request request = requestBuilder
-                    .setType(RequestProtos.RequestType.CHATCHANNEL)//3)
+                    .setType(RequestProtos.RequestType.CHATCHANNEL)
                     .setToken(token)
                     .setChat(RequestProtos.Chat.newBuilder()
                             .setTo(channelName)
@@ -334,11 +323,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                     .setChannel(channelName)
                     .build();
 
-            try {
-                channel.writeAndFlush(request).await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            channel.writeAndFlush(request).await();
         }
     }
 
@@ -348,13 +333,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
             return;
         }
 
-        // gui request exit kenh
         RequestProtos.Request request = requestBuilder
-                .setType(RequestProtos.RequestType.EXITCHANNEL)//5
+                .setType(RequestProtos.RequestType.EXITCHANNEL)
                 .setToken(token)
                 .setChannel(channelName)
                 .build();
+
         channel.writeAndFlush(request).await();
     }
-//
 }

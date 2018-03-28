@@ -11,6 +11,10 @@ public class Authentication {
     private static String privateKey = "ahihiconcho";
 
     public static boolean verifyToken(String payload, String token) {
+        if (payload == null || token == null) {
+            return false;
+        }
+
         String[] part = token.split("\\.");
         String payloadDecoded = base64Decode(part[0]);
         String payloadSecret = hmacSha256(part[0]);
