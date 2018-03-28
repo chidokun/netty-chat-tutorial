@@ -21,7 +21,6 @@ enum ResponseType {
 
 message Response {
     required ResponseType   type    = 1;
-    optional string         token   = 2;
-    optional Message        message = 3;
-    optional int64          time    = 4;
+    optional Message        message = 2;
+    optional int64          time    = 3;
 }

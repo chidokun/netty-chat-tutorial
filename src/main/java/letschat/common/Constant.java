@@ -14,4 +14,5 @@ public class Constant {
     public static final String LISTCHANNEL  = ":l";
     public static final String EXITCHANNEL  = ":x";
     public static final String NOTHING      = "";
+    public static final String CHATCHANNEL  = ":cc";
 }

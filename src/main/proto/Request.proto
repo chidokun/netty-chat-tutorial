@@ -14,6 +14,7 @@ enum RequestType {
     JOINCHANNEL = 5;
     LISTCHANNEL = 6;
     EXITCHANNEL = 7;
+    CHATCHANNEL = 8;
 }
 
 message User { //use for sign up or login
@@ -35,7 +36,7 @@ message Request {
     required string         token   = 2;
     optional User           user    = 3;
     optional Chat           chat    = 4;
-    optional Channel        channel = 5;
+    optional string        channel  = 5;
 }
 
 //Fix

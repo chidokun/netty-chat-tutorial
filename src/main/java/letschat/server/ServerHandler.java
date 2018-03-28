@@ -14,18 +14,16 @@ import letschat.storage.RocksDBStorage;
 import letschat.storage.Storage;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Request> {
     private ChannelGroup group;
     private Map<String, ChannelId> userMap;
     private Map<ChannelId, String> userMapReverse;
     private Storage<String, String> storage;
-    private Map<String, ChannelGroup> groupsChat = null;
-
+    private static Map<String, Set<String>> groupsChat = new ConcurrentHashMap<>();
+    private String userName = "";
 
     public ServerHandler(ChannelGroup group, Map<String, ChannelId> userMap,
                          Map<ChannelId, String> userMapReverse, Storage storage) {
@@ -43,12 +41,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestProtos.Request request) throws Exception {
+
         System.out.println("Receive from: [" + ctx.channel().remoteAddress() + "]");
         System.out.println("Server received:\n" + request);
         ResponseProtos.Response.Builder responseBuilder = ResponseProtos.Response.newBuilder();
         ResponseProtos.Response response = null;
-        String userName, password;
-        ChannelGroup channelGroup = null;
+        String password;
+        Set<String> channelGroup = null;
         switch (request.getType()) {
 
             case SIGNUP:
@@ -87,17 +86,20 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
 //                                    .build())
 //                            .build();
 //                } else
-                    if (password != null && password.equals(this.storage.get("user." + userName + ".pass"))) {
+                if (password != null && password.equals(this.storage.get("user." + userName + ".pass"))) {
                     // đúng pass, trả về thành công và token
                     String token = Authentication.generateToken(userName);
                     if (userMap.containsKey(userName))
                         this.userMapReverse.remove(userMap.get(userName));
-                    System.out.println(userMap.entrySet() + "\t" + userMapReverse.entrySet());
+
                     this.userMap.put(userName, ctx.channel().id());
                     this.userMapReverse.put(ctx.channel().id(), userName);
                     response = responseBuilder
                             .setType(ResponseProtos.ResponseType.TOKEN)
-                            .setToken(token)
+                            .setMessage(ResponseProtos.Message.newBuilder()
+                                    .setFrom("Server")
+                                    .setContent(token)
+                                    .build())
                             .build();
                 } else {
                     // sai pass, trả về response lỗi
@@ -112,6 +114,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
 
                 ctx.writeAndFlush(response);
                 System.out.println(userName + " login " + ctx.channel().remoteAddress() + response);
+            
+                
                 break;
             case LOGOUT:
                 // ================= LOGOUT ==================
@@ -155,11 +159,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                         return;
                     }
 
+                    //----------------------
                     String key = String.format("Message.%s.%s.%d",
                             userName,
                             toUser,
                             System.currentTimeMillis());
+
                     this.storage.put(key, content);
+                    //---------------------------
+
                     // tra ve cho user dang dang nhap
                     response = responseBuilder
                             .setType(ResponseProtos.ResponseType.MESSAGE)
@@ -171,8 +179,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .setTime(System.currentTimeMillis())
                             .build();
 
-//
-
                     if (this.userMap.get(request.getChat().getTo()) != null) {
                         Channel channel = this.group.find(this.userMap.get(request.getChat().getTo()));
                         System.out.printf("Send to [%s]:\n%s\n", channel.remoteAddress(), response);
@@ -182,12 +188,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                         String storedKey = "user." + toUser + ".receive";
                         int sequenceNumber = 1;
                         if (this.storage.contains(storedKey)) {
-                            sequenceNumber = Integer.parseInt(this.storage.get(storedKey).toString()) + 1;
+                            sequenceNumber = Integer.parseInt(this.storage.get(storedKey)) + 1;
 
                             this.storage.remove(storedKey);
                         }
                         this.storage.put(storedKey, String.valueOf(sequenceNumber));
-                        this.storage.put(storedKey + sequenceNumber, new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]").format(System.currentTimeMillis()) + " " + userName +": "+ response.getMessage().getContent());
+                        this.storage.put(storedKey + sequenceNumber, new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]").format(System.currentTimeMillis()) + " " + userName + ": " + response.getMessage().getContent());
 
                     }
                 }
@@ -214,12 +220,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .setType(ResponseProtos.ResponseType.NOTLOGIN)
                             .build();
                 } else {
-                    userName = this.userMapReverse.get(ctx.channel().id());
+//                    userName = this.userMapReverse.get(ctx.channel().id());
                     String storedKey = "user." + userName + ".receive";
                     boolean contains = this.storage.contains(storedKey);
                     if (contains) {
 
-                        int messageNumber = Integer.parseInt(this.storage.get(storedKey).toString());
+                        int messageNumber = Integer.parseInt(this.storage.get(storedKey));
                         System.out.println("so luong mess: " + messageNumber);
                         for (int i = 1; i <= messageNumber; i++) {
                             if (!this.storage.contains(storedKey + i))
@@ -250,16 +256,21 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .setType(ResponseProtos.ResponseType.NOTLOGIN)
                             .build();
                 } else {
-                    //
-                    channelGroup = groupsChat.get(request.getChannel().getName());
-                    if (channelGroup == null) {
-                        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-                        groupsChat.put(request.getChannel().getName(), channelGroup);
+                    //                Sys
+                    channelGroup = groupsChat.get(request.getChannel());
+                    if (channelGroup ==null) {
+                        channelGroup = ConcurrentHashMap.newKeySet();
+                        groupsChat.put(request.getChannel(), channelGroup);
                     }
+                    channelGroup.add(userName);
 
-                    channelGroup.add(ctx.channel());
+
                     response = responseBuilder
                             .setType(ResponseProtos.ResponseType.SUCCESS)
+                            .setMessage(ResponseProtos.Message.newBuilder()
+                                    .setFrom("Server")
+                                    .setContent("join group successfully! ")
+                                    .build())
                             .build();
                     ctx.writeAndFlush(response);
                     System.out.println("Join successed ");
@@ -271,9 +282,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                             .setType(ResponseProtos.ResponseType.NOTLOGIN)
                             .build();
                 } else {
-                    channelGroup = groupsChat.get(request.getChannel().getName());
+                    channelGroup = groupsChat.get(request.getChannel());
                     if (channelGroup != null) {
-                        channelGroup.remove(ctx.channel());
+                        channelGroup.remove(userName);
                     }
                     response = responseBuilder
                             .setType(ResponseProtos.ResponseType.SUCCESS)
@@ -287,18 +298,98 @@ public class ServerHandler extends SimpleChannelInboundHandler<RequestProtos.Req
                     response = responseBuilder
                             .setType(ResponseProtos.ResponseType.NOTLOGIN)
                             .build();
+
+                    ctx.writeAndFlush(response);
+                    break;
                 } else {
-                    for (Map.Entry<String, ChannelGroup> group : groupsChat.entrySet()) {
+                    System.out.println(groupsChat);
+                    for (Map.Entry<String, Set<String>> group : groupsChat.entrySet()) {
+                        if (group.getValue().contains(userName)) {
+                            response = responseBuilder
+                                    .setType(ResponseProtos.ResponseType.MESSAGE)
+                                    .setMessage(ResponseProtos.Message.newBuilder()
+                                            .setFrom("Server")
+                                            .setContent(group.getKey())
+                                            .build())
+                                    .build();
+                            ctx.writeAndFlush(response);
+                        }
+                    }
+                    break;
+                }
+            case CHATCHANNEL:
+
+                if (!Authentication.verifyToken(userMapReverse.get(ctx.channel().id()), request.getToken())) {
+                    response = responseBuilder
+                            .setType(ResponseProtos.ResponseType.NOTLOGIN)
+                            .build();
+                } else {
+
+                    String toChannel = request.getChannel();
+                    String content = request.getChat().getMessage();
+                    System.out.println("Channel chat: " + userName);
+                    if (!groupsChat.containsKey(toChannel)) {
                         response = responseBuilder
-                                .setType(ResponseProtos.ResponseType.MESSAGE)
+                                .setType(ResponseProtos.ResponseType.FAILURE)
                                 .setMessage(ResponseProtos.Message.newBuilder()
                                         .setFrom("Server")
-                                        .setContent(group.getKey())
+                                        .setContent("Channel not found!")
                                         .build())
                                 .build();
                         ctx.writeAndFlush(response);
+                        return;
                     }
+                    channelGroup = groupsChat.get(toChannel);
+
+                    System.out.println(channelGroup);
+                    System.out.println(groupsChat);
+                    for (String toUser : channelGroup) {
+                        if (toUser.equals(userName))
+                            continue;
+
+                        //----------------------
+                        String key = String.format("Message.%s.%s.%d",
+                                (request.getChannel() + "_" + userName),
+                                toUser,
+                                System.currentTimeMillis());
+
+                        this.storage.put(key, content);
+                        //---------------------------
+
+                        // tra ve cho user dang dang nhap
+                        response = responseBuilder
+                                .setType(ResponseProtos.ResponseType.MESSAGE)
+                                .setMessage(ResponseProtos.Message.newBuilder()
+                                        .setFrom(request.getChannel() + "_" + userName)
+                                        .setContent("" + request.getChat().getMessage())
+                                        .build())
+                                .setTime(System.currentTimeMillis())
+                                .build();
+
+                        if (this.userMap.get(toUser) != null) {
+                            Channel channel = this.group.find(this.userMap.get(toUser));
+                            System.out.printf("Send to [%s]:\n%s\n", channel.remoteAddress(), response);
+                            channel.writeAndFlush(response);
+                        } else { // user chua dang nhap, luu xuong db
+
+                            String storedKey = "user." + toUser + ".receive";
+                            int sequenceNumber = 1;
+                            if (this.storage.contains(storedKey)) {
+                                sequenceNumber = Integer.parseInt(this.storage.get(storedKey)) + 1;
+
+                                this.storage.remove(storedKey);
+                            }
+                            this.storage.put(storedKey, String.valueOf(sequenceNumber));
+                            this.storage.put(storedKey + sequenceNumber, new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]").format(System.currentTimeMillis()) + " "
+                                    + toChannel + "_"
+                                    + userName + ": "
+                                    + response.getMessage().getContent());
+                        }
+                    }
+
+                    System.out.printf("Send to [%s]:\n%s\n", ctx.channel().remoteAddress(), response);
                 }
+                break;
             default:
                 break;
         }
