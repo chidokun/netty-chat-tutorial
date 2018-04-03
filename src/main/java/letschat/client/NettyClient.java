@@ -42,6 +42,7 @@ public class NettyClient {
                 pipeline.addLast(clientHandler);
             }
         });
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
 
         System.out.println("LET'S CHAT\n======================");
 

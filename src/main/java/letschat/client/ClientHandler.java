@@ -21,6 +21,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     private static DateFormat fm = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]");
     private static Scanner in = new Scanner(System.in);
     private static RequestProtos.Request.Builder requestBuilder = RequestProtos.Request.newBuilder();
+    private static boolean isLogin = false;
     private static String token = "";
 
     private static Channel channel;
@@ -40,13 +41,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
             case TOKEN:
                 System.out.println("Login successfully!");
                 token = response.getMessage().getContent();
+                isLogin = true;
                 break;
             case DUPLICATE:
-
                 System.out.println("Duplicate name!");
                 break;
             case FAILURE:
-
                 System.out.println("from: " + response.getMessage().getFrom() + "\n\t" + response.getMessage().getContent());
                 break;
             case MESSAGE:
@@ -70,7 +70,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
 
     public static boolean mainProgram(String command) {
         try {
-
             if (command.equalsIgnoreCase(":q")) {
                 System.out.println("Good bye!");
                 return false;
@@ -88,6 +87,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
                     break;
                 case Constant.LOGOUT:
                     logOut();
+                    token = "";
+                    isLogin = false;
                     break;
                 case Constant.SIGNUP:
                     showSignUp();
@@ -122,7 +123,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     }
 
     private static void getMessages() {
-        System.out.println("Get messages");
+        if (!isLogin) {
+            System.out.println("Please login first!\n");
+            return;
+        }
+
+        System.out.println("Get messages:");
         RequestProtos.Request request = requestBuilder
                 .setType(RequestProtos.RequestType.GETMESSAGE)//5
                 .setToken(token)
@@ -242,6 +248,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     }
 
     private static void logOut() throws InterruptedException {
+        if (!isLogin) {
+            System.out.println("Please login first!\n");
+            return;
+        }
+
         RequestProtos.Request request = RequestProtos.Request.newBuilder()
                 .setType(RequestProtos.RequestType.LOGOUT)
                 .setToken(token)
@@ -250,6 +261,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     }
 
     private static void showUserChat() throws InterruptedException {
+        if (!isLogin) {
+            System.out.println("Please login first!\n");
+            return;
+        }
+
         String userName = inputString("User name: ");
         if (userName.contains(":b")) {
             return;
@@ -276,6 +292,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     }
 
     private static void joinChannel() throws InterruptedException {
+        if (!isLogin) {
+            System.out.println("Please login first!\n");
+            return;
+        }
+
         String channelName = inputString("Channel: ");
         if (channelName.contains(":b")) {
             return;
@@ -300,6 +321,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<ResponseProtos.Re
     }
 
     private static void chatChannel() throws InterruptedException {
+        if (!isLogin) {
+            System.out.println("Please login first!\n");
+            return;
+        }
+
         String channelName = inputString("Channel: ");
         if (channelName.contains(":b")) {
             return;
